@@ -4,7 +4,14 @@ This is the fork of opt-viewer for GCC support
 
 ## Usage
 
-- Compile your code with GCC compiler option `-fsave-optimization-record`
+- Compile your C/C++ code with GCC compiler option `-fsave-optimization-record`:
+```
+gcc -c main.c -fsave-optimization-record -o main
+```
+or
+```
+g++ -c main.cpp -fsave-optimization-record -o main
+```
 
 - First, you need to install [Python](https://www.python.org/). Please download latest version. Make sure that you checked in `Add to PATH` when finishing Python installation
 
