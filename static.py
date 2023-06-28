@@ -1,11 +1,11 @@
-# TODO: license
-
 import argparse
 from collections import Counter
 import html
 import os
 from pprint import pprint
+from pathlib import Path
 import sys
+import time
 
 import pygments.lexers
 import pygments.styles
@@ -14,11 +14,24 @@ import pygments.formatters
 from optrecord import TranslationUnit, Record, Expr, Stmt, SymtabNode
 from utils import find_records, log, get_effective_result
 
+class Location:
+    def __init__(self, file, line):
+        self.file = file
+        self.line = line
+
+def srcfile_to_html(file_name):
+    return html.escape("%s.html" % file_name.replace('/', '|'))
+
+def url_from_location(loc):
+    return '%s#line-%i' % (srcfile_to_html(loc.file), loc.line)
+
 def srcfile_to_html(src_file):
     """
     Generate a .html filename for src_file
     """
-    return html.escape("%s.html" % src_file.replace('/', '|'))
+    file_name = os.path.basename(src_file)
+    html_file_name = html.escape(file_name)
+    return html_file_name
 
 def function_to_html(function):
     """
@@ -102,8 +115,12 @@ def write_inlining_chain(f, record):
             first = False
     f.write('    </ul></td>\n')
 
+def remove_file_extension(filename):
+    base_name = os.path.splitext(filename)[0]
+    return base_name
+
 def url_from_location(loc):
-    return '%s#line-%i' % (srcfile_to_html(loc.file), loc.line)
+    return '%s.html#line-%i' % (srcfile_to_html(remove_file_extension(loc.file)), loc.line)
 
 def write_html_header(f, title, head_content):
     """
@@ -136,6 +153,8 @@ def write_html_footer(f):
             '    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js" integrity="sha384-smHYKdLADwkXOn1EmN1qk/HfnUcbVRZyYmZ4qpPea6sjB/pTJ0euyQp0Mk8ck+5T" crossorigin="anonymous"></script>\n'
             '  </body>\n'
             '</html>\n')
+    
+    f.close()
 
 def make_index_html(out_dir, tus, highest_count):
     log(' make_index_html')
@@ -238,7 +257,7 @@ def make_per_source_file_html(build_dir, out_dir, tus, highest_count):
         f.write(formatter.get_style_defs())
 
     for src_file in by_src_file:
-        log('  generating HTML for %r' % src_file)
+        log('  generating HTML for %r\n' % src_file)
 
         if 0:
             print(src_file)
@@ -249,7 +268,10 @@ def make_per_source_file_html(build_dir, out_dir, tus, highest_count):
             print(code)
             print('*' * 76)
 
-        lexer = pygments.lexers.guess_lexer_for_filename(src_file, code)
+        try:
+            lexer = pygments.lexers.guess_lexer_for_filename(src_file, code)
+        except Exception as e:
+            print(f"Skipped unparsed file {src_file} because exception throw is: {e}\n")
 
         # Use pygments to convert it all to HTML:
         code_as_html = pygments.highlight(code, lexer, formatter)
@@ -364,6 +386,44 @@ def make_per_source_file_html(build_dir, out_dir, tus, highest_count):
 
             f.write('</table>\n')
             write_html_footer(f)
+
+            time.sleep(1.0)
+
+            """
+            Because all of file are generated as HTML and the file are actually
+            contains HTML contents, so that we need to rename file to HTML
+            so that the browser can be displayed
+            """
+            filename = os.path.basename(src_file)
+            print(filename)
+            print(src_file)
+            currentWorkingDir = out_dir
+            print(f"Filename {filename} that skipped are already in HTML and can be renamed to .html, but")
+            print("some features will not work!")
+            fileInWorkingDir = currentWorkingDir + "\\" + filename
+            fs_path = Path(filename)
+            if fs_path.suffix:
+                # File has an extension
+                base_name = fs_path.stem
+            else:
+                # File does not have an extension
+                base_name = fs_path.name
+
+            print(f"File generated to {out_dir} as {fileInWorkingDir}")
+            print(currentWorkingDir + "\\" + base_name)
+
+            counter: int = 1
+            if os.path.exists(currentWorkingDir + "\\" + base_name + ".html"):
+                renamed_based_name = f"{base_name}_{counter}"
+                if os.path.exists(currentWorkingDir + "\\" + base_name + "_" + str(counter) + ".html"):
+                    counter += 1
+                    renamed_based_name = f"{base_name}_{counter}"
+                
+                os.rename(fileInWorkingDir, currentWorkingDir + "\\" + renamed_based_name + ".html")
+                print(f"Renamed from {fileInWorkingDir} to {currentWorkingDir}\\{renamed_based_name}.html\n")
+            else:
+                os.rename(fileInWorkingDir, currentWorkingDir + "\\" + base_name + ".html")
+                print(f"Renamed from {fileInWorkingDir} to {currentWorkingDir}\\{base_name}.html\n")
 
 def write_cfg_view(f, view_id, cfg):
     # see http://visjs.org/docs/network/
