@@ -4,6 +4,8 @@ This is the fork of opt-viewer for GCC support
 
 ## Usage
 
+- Compile your code with GCC compiler option `-fsave-optimization-record`
+
 - First, you need to install [Python](https://www.python.org/). Please download latest version. Make sure that you checked in `Add to PATH` when finishing Python installation
 
 - On Windows, you need to install [Git for Windows](https://gitforwindows.org/). Please download latest version. You can find install instructions on the Internet
@@ -25,8 +27,6 @@ pip install -r requirements.txt
 ```
 python.exe opt-viewer.py
 ```
-
-- Compile your code with GCC compiler option `-fsave-optimization-record`
 
 - Use `-h` for showing help, which contains informations will help you using this tool:
 ```
