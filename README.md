@@ -4,7 +4,7 @@ This is the fork of opt-viewer for GCC support
 
 ## Usage
 
-- First, compile your C/C++ code with GCC compiler option `-fsave-optimization-record`:
+- First, compile your C/C++ code with GCC's compiler option `-fsave-optimization-record`:
 ```
 gcc -c main.c -fsave-optimization-record -o main
 ```
@@ -13,7 +13,7 @@ or
 g++ -c main.cpp -fsave-optimization-record -o main
 ```
 
-- First, you need to install [Python](https://www.python.org/). Please download latest version. Make sure that you checked in `Add to PATH` when finishing Python installation
+- You also need to install [Python](https://www.python.org/). Please download latest version. Make sure that you checked in `Add to PATH` when finishing Python installation
 
 - On Windows, you need to install [Git for Windows](https://gitforwindows.org/). Please download latest version. You can find install instructions on the Internet
 
