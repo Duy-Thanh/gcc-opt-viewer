@@ -4,7 +4,7 @@ This is the fork of opt-viewer for GCC support
 
 ## Usage
 
-- Compile your C/C++ code with GCC compiler option `-fsave-optimization-record`:
+- First, compile your C/C++ code with GCC compiler option `-fsave-optimization-record`:
 ```
 gcc -c main.c -fsave-optimization-record -o main
 ```
