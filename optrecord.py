@@ -1,3 +1,4 @@
+# TODO: license
 import gzip
 import json
 
