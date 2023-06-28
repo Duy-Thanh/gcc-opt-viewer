@@ -1,4 +1,3 @@
-# TODO: license
 import html
 import os
 import urllib

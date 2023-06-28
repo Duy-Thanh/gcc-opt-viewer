@@ -1,5 +1,3 @@
-# TODO: license
-
 import argparse
 from collections import Counter
 import html
@@ -8,7 +6,6 @@ from pprint import pprint
 from pathlib import Path
 import sys
 import time
-import shutil
 
 import pygments.lexers
 import pygments.styles
@@ -170,8 +167,6 @@ def make_index_html(out_dir, tus, highest_count):
     # Sort by highest-count down to lowest-count
     records = sorted(records, key=record_sort_key)
 
-    print(records)
-
     filename = os.path.join(out_dir, "index.html")
     with open(filename, "w") as f:
         write_html_header(f, 'Optimizations', '')
@@ -193,7 +188,6 @@ def make_index_html(out_dir, tus, highest_count):
             f.write('    <td>\n')
             if record.location:
                 loc = record.location
-                print(loc)
                 f.write('<a href="%s">' % url_from_location (loc))
                 f.write(html.escape(str(loc)))
                 f.write('</a>')
@@ -263,7 +257,7 @@ def make_per_source_file_html(build_dir, out_dir, tus, highest_count):
         f.write(formatter.get_style_defs())
 
     for src_file in by_src_file:
-        log('  generating HTML for %r' % src_file)
+        log('  generating HTML for %r\n' % src_file)
 
         if 0:
             print(src_file)
@@ -396,7 +390,9 @@ def make_per_source_file_html(build_dir, out_dir, tus, highest_count):
             time.sleep(1.0)
 
             """
-            Rename file
+            Because all of file are generated as HTML and the file are actually
+            contains HTML contents, so that we need to rename file to HTML
+            so that the browser can be displayed
             """
             filename = os.path.basename(src_file)
             print(filename)
@@ -413,7 +409,7 @@ def make_per_source_file_html(build_dir, out_dir, tus, highest_count):
                 # File does not have an extension
                 base_name = fs_path.name
 
-            print(fileInWorkingDir)
+            print(f"File generated to {out_dir} as {fileInWorkingDir}")
             print(currentWorkingDir + "\\" + base_name)
 
             counter: int = 1
@@ -423,11 +419,11 @@ def make_per_source_file_html(build_dir, out_dir, tus, highest_count):
                     counter += 1
                     renamed_based_name = f"{base_name}_{counter}"
                 
-                shutil.copy(fileInWorkingDir, currentWorkingDir + "\\" + renamed_based_name + ".html")
-                print(f"Copied from {fileInWorkingDir} to {currentWorkingDir}\\{renamed_based_name}.html\n")
+                os.rename(fileInWorkingDir, currentWorkingDir + "\\" + renamed_based_name + ".html")
+                print(f"Renamed from {fileInWorkingDir} to {currentWorkingDir}\\{renamed_based_name}.html\n")
             else:
-                shutil.copy(fileInWorkingDir, currentWorkingDir + "\\" + base_name + ".html")
-                print(f"Copied from {fileInWorkingDir} to {currentWorkingDir}\\{base_name}.html\n")
+                os.rename(fileInWorkingDir, currentWorkingDir + "\\" + base_name + ".html")
+                print(f"Renamed from {fileInWorkingDir} to {currentWorkingDir}\\{base_name}.html\n")
 
 def write_cfg_view(f, view_id, cfg):
     # see http://visjs.org/docs/network/
